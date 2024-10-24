@@ -12,6 +12,14 @@ export async function createTable() {
     )
   `);
 
-  await db.exec(`ALTER TABLE stores ADD COLUMN lat REAL`);
-  await db.exec(`ALTER TABLE stores ADD COLUMN lng REAL`);
+  const columns = await db.all(`PRAGMA table_info(stores)`);
+  const columnNames = columns.map(column => column.name);
+
+  if (!columnNames.includes('lat')) {
+    await db.exec(`ALTER TABLE stores ADD COLUMN lat REAL`);
+  }
+
+  if (!columnNames.includes('lng')) {
+    await db.exec(`ALTER TABLE stores ADD COLUMN lng REAL`);
+  }
 }
