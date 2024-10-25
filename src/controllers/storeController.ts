@@ -4,7 +4,7 @@ import { getAddressByCep } from '../services/cepService';
 import { getCoordinates } from '../services/geocodingService';
 import { calculateDistance } from '../utils/distanceUtils';
 
-export async function addStore(req: Request, res: Response): Promise<void> {
+export async function addStore(req: Request, res: Response) {
   const db = await openDb();
   const { name, address, number, cep } = req.body;
 
@@ -23,7 +23,17 @@ export async function addStore(req: Request, res: Response): Promise<void> {
 export async function listStores(req: Request, res: Response): Promise<void> {
   const db = await openDb();
   const stores = await db.all('SELECT * FROM stores');
-  res.json(stores);
+  res.json(stores.map(store => ({
+    id: store.id,
+    name: store.name,
+    address: store.address,
+    number: store.number,
+    cep: store.cep,
+    coordinates: {
+      lat: store.lat,
+      lng: store.lng
+    }
+  })));
 }
 
 export async function findNearbyStores(req: Request, res: Response): Promise<void> {
@@ -47,9 +57,21 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
 
     if (nearbyStores.length === 0) {
       res.status(404).json({ message: 'Nenhuma loja encontrada num raio de 100km' });
+      return;
     }
 
-    res.json(nearbyStores);
+    res.json(nearbyStores.map(store => ({
+      id: store.id,
+      name: store.name,
+      address: store.address,
+      number: store.number,
+      cep: store.cep,
+      coordinates: {
+        lat: store.lat,
+        lng: store.lng
+      },
+      distance: store.distance
+    })));
   } catch (error) {
     res.status(400).json({ message: (error as Error).message });
   }
