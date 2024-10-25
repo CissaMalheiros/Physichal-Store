@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import logger from '../utils/logger';
 
 interface Address {
   cep: string;
@@ -15,13 +16,22 @@ interface Address {
 }
 
 export async function getAddressByCep(cep: string): Promise<Address> {
-  const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-  if (!response.ok) {
-    throw new Error('Erro ao buscar o CEP');
+  try {
+    logger.info(`Fetching address for CEP: ${cep}`);
+    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    if (!response.ok) {
+      logger.error('Error fetching CEP:', response.statusText);
+      throw new Error('Erro ao buscar o CEP');
+    }
+    const data = await response.json() as Address;
+    if (data.erro) {
+      logger.error('CEP not found:', cep);
+      throw new Error('CEP não encontrado');
+    }
+    logger.info('Address fetched successfully');
+    return data;
+  } catch (error) {
+    logger.error('Error in getAddressByCep:', error);
+    throw error;
   }
-  const data = await response.json() as Address;
-  if (data.erro) {
-    throw new Error('CEP não encontrado');
-  }
-  return data;
 }

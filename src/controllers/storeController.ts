@@ -10,11 +10,13 @@ export async function addStore(req: Request, res: Response) {
   const { name, address, number, cep } = req.body;
 
   try {
+    logger.info(`Adding store: ${name}, CEP: ${cep}`);
     const addressData = await getAddressByCep(cep);
     const fullAddress = `${addressData.logradouro}, ${number}, ${addressData.localidade}, ${addressData.uf}`;
     const coordinates = await getCoordinates(fullAddress);
 
     await db.run('INSERT INTO stores (name, address, number, cep, lat, lng) VALUES (?, ?, ?, ?, ?, ?)', [name, addressData.logradouro, number, cep, coordinates.lat, coordinates.lng]);
+    logger.info(`Store added successfully: ${name}`);
     res.status(201).json({ message: 'Store added successfully' });
   } catch (error) {
     logger.error('Error adding store:', error);
@@ -23,25 +25,33 @@ export async function addStore(req: Request, res: Response) {
 }
 
 export async function listStores(req: Request, res: Response): Promise<void> {
-  const db = await openDb();
-  const stores = await db.all('SELECT * FROM stores');
-  res.json(stores.map(store => ({
-    id: store.id,
-    name: store.name,
-    address: store.address,
-    number: store.number,
-    cep: store.cep,
-    coordinates: {
-      lat: store.lat,
-      lng: store.lng
-    }
-  })));
+  try {
+    logger.info('Listing all stores');
+    const db = await openDb();
+    const stores = await db.all('SELECT * FROM stores');
+    res.json(stores.map(store => ({
+      id: store.id,
+      name: store.name,
+      address: store.address,
+      number: store.number,
+      cep: store.cep,
+      coordinates: {
+        lat: store.lat,
+        lng: store.lng
+      }
+    })));
+    logger.info('Stores listed successfully');
+  } catch (error) {
+    logger.error('Error listing stores:', error);
+    res.status(500).json({ message: 'Error listing stores' });
+  }
 }
 
 export async function findNearbyStores(req: Request, res: Response): Promise<void> {
   const { cep } = req.params;
 
   try {
+    logger.info(`Finding nearby stores for CEP: ${cep}`);
     const addressData = await getAddressByCep(cep);
     const fullAddress = `${addressData.logradouro}, ${addressData.localidade}, ${addressData.uf}`;
     const userCoordinates = await getCoordinates(fullAddress);
@@ -58,6 +68,7 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
       .sort((a, b) => a.distance - b.distance);
 
     if (nearbyStores.length === 0) {
+      logger.info('No stores found within 100km radius');
       res.status(404).json({ message: 'Nenhuma loja encontrada num raio de 100km' });
       return;
     }
@@ -74,6 +85,7 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
       },
       distance: store.distance
     })));
+    logger.info('Nearby stores found successfully');
   } catch (error) {
     logger.error('Error finding nearby stores:', error);
     res.status(400).json({ message: (error as Error).message });
