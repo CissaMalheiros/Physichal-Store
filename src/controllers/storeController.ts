@@ -3,6 +3,7 @@ import { openDb } from '../database';
 import { getAddressByCep } from '../services/cepService';
 import { getCoordinates } from '../services/geocodingService';
 import { calculateDistance } from '../utils/distanceUtils';
+import logger from '../utils/logger';
 
 export async function addStore(req: Request, res: Response) {
   const db = await openDb();
@@ -16,6 +17,7 @@ export async function addStore(req: Request, res: Response) {
     await db.run('INSERT INTO stores (name, address, number, cep, lat, lng) VALUES (?, ?, ?, ?, ?, ?)', [name, addressData.logradouro, number, cep, coordinates.lat, coordinates.lng]);
     res.status(201).json({ message: 'Store added successfully' });
   } catch (error) {
+    logger.error('Error adding store:', error);
     res.status(400).json({ message: (error as Error).message });
   }
 }
@@ -73,6 +75,7 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
       distance: store.distance
     })));
   } catch (error) {
+    logger.error('Error finding nearby stores:', error);
     res.status(400).json({ message: (error as Error).message });
   }
 }
