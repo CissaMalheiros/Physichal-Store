@@ -91,3 +91,25 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
     res.status(400).json({ message: (error as Error).message });
   }
 }
+
+export async function deleteStore(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+
+  try {
+    logger.info(`Deleting store with ID: ${id}`);
+    const db = await openDb();
+    const result = await db.run('DELETE FROM stores WHERE id = ?', [id]);
+
+    if (result.changes === 0) {
+      logger.info(`Store with ID: ${id} not found`);
+      res.status(404).json({ message: 'Loja não encontrada' });
+      return;
+    }
+
+    logger.info(`Store with ID: ${id} deleted successfully`);
+    res.status(200).json({ message: 'Loja deletada com sucesso' });
+  } catch (error) {
+    logger.error('Error deleting store:', error);
+    res.status(500).json({ message: 'Erro ao deletar a loja' });
+  }
+}
