@@ -7,7 +7,7 @@ import logger from '../utils/logger';
 
 export async function addStore(req: Request, res: Response) {
   const db = await openDb();
-  const { name, address, number, cep } = req.body;
+  const { name, number, cep } = req.body;
 
   try {
     logger.info(`Adicionando loja: ${name}, CEP: ${cep}`);
@@ -34,11 +34,11 @@ export async function listStores(req: Request, res: Response): Promise<void> {
       id: store.id,
       nome: store.name,
       rua: store.address,
+      bairro: store.bairro,
       numero: store.number,
       cep: store.cep,
       cidade: store.cidade,
       estado: store.estado,
-      bairro: store.bairro,
       coordenadas: {
         lat: store.lat,
         lng: store.lng
@@ -81,11 +81,11 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
       id: store.id,
       nome: store.name,
       rua: store.address,
+      bairro: store.bairro,
       numero: store.number,
       cep: store.cep,
       cidade: store.cidade,
       estado: store.estado,
-      bairro: store.bairro,
       coordenadas: {
         lat: store.lat,
         lng: store.lng
