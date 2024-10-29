@@ -12,7 +12,8 @@ export async function createTable() {
       lat REAL,
       lng REAL,
       cidade TEXT,
-      estado TEXT
+      estado TEXT,
+      bairro TEXT
     )
   `);
 
@@ -33,5 +34,9 @@ export async function createTable() {
 
   if (!columnNames.includes('estado')) {
     await db.exec(`ALTER TABLE stores ADD COLUMN estado TEXT`);
+  }
+
+  if (!columnNames.includes('bairro')) {
+    await db.exec(`ALTER TABLE stores ADD COLUMN bairro TEXT`);
   }
 }
