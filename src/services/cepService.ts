@@ -17,21 +17,21 @@ interface Address {
 
 export async function getAddressByCep(cep: string): Promise<Address> {
   try {
-    logger.info(`Fetching address for CEP: ${cep}`);
+    logger.info(`Buscando endereço para o CEP: ${cep}`);
     const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
     if (!response.ok) {
-      logger.error('Error fetching CEP:', response.statusText);
+      logger.error('Erro ao buscar CEP:', response.statusText);
       throw new Error('Erro ao buscar o CEP');
     }
     const data = await response.json() as Address;
     if (data.erro) {
-      logger.error('CEP not found:', cep);
+      logger.error('CEP não encontrado:', cep);
       throw new Error('CEP não encontrado');
     }
-    logger.info('Address fetched successfully');
+    logger.info('Endereço buscado com sucesso');
     return data;
   } catch (error) {
-    logger.error('Error in getAddressByCep:', error);
+    logger.error('Erro na função getAddressByCep:', error);
     throw error;
   }
 }
