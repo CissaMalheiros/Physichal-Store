@@ -6,14 +6,14 @@ export async function createTable() {
     CREATE TABLE IF NOT EXISTS stores (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
-      address TEXT,
+      street TEXT,
       number TEXT,
       cep TEXT,
       lat REAL,
       lng REAL,
-      cidade TEXT,
-      estado TEXT,
-      bairro TEXT
+      city TEXT,
+      state TEXT,
+      district TEXT
     )
   `);
 
@@ -28,15 +28,19 @@ export async function createTable() {
     await db.exec(`ALTER TABLE stores ADD COLUMN lng REAL`);
   }
 
-  if (!columnNames.includes('cidade')) {
-    await db.exec(`ALTER TABLE stores ADD COLUMN cidade TEXT`);
+  if (!columnNames.includes('city')) {
+    await db.exec(`ALTER TABLE stores ADD COLUMN city TEXT`);
   }
 
-  if (!columnNames.includes('estado')) {
-    await db.exec(`ALTER TABLE stores ADD COLUMN estado TEXT`);
+  if (!columnNames.includes('state')) {
+    await db.exec(`ALTER TABLE stores ADD COLUMN state TEXT`);
   }
 
-  if (!columnNames.includes('bairro')) {
-    await db.exec(`ALTER TABLE stores ADD COLUMN bairro TEXT`);
+  if (!columnNames.includes('district')) {
+    await db.exec(`ALTER TABLE stores ADD COLUMN district TEXT`);
+  }
+
+  if (!columnNames.includes('street')) {
+    await db.exec(`ALTER TABLE stores ADD COLUMN street TEXT`);
   }
 }

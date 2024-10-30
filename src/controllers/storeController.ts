@@ -15,7 +15,7 @@ export async function addStore(req: Request, res: Response) {
     const fullAddress = `${addressData.logradouro}, ${number}, ${addressData.localidade}, ${addressData.uf}`;
     const coordinates = await getCoordinates(fullAddress);
 
-    await db.run('INSERT INTO stores (name, address, number, cep, lat, lng, cidade, estado, bairro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    await db.run('INSERT INTO stores (name, street, number, cep, lat, lng, city, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [name, addressData.logradouro, number, cep, coordinates.lat, coordinates.lng, addressData.localidade, addressData.uf, addressData.bairro]);
     logger.info(`Loja adicionada com sucesso: ${name}`);
     res.status(201).json({ message: 'Loja adicionada com sucesso' });
@@ -33,12 +33,12 @@ export async function listStores(req: Request, res: Response): Promise<void> {
     res.json(stores.map(store => ({
       id: store.id,
       nome: store.name,
-      rua: store.address,
-      bairro: store.bairro,
+      rua: store.street,
       numero: store.number,
       cep: store.cep,
-      cidade: store.cidade,
-      estado: store.estado,
+      cidade: store.city,
+      estado: store.state,
+      bairro: store.district,
       coordenadas: {
         lat: store.lat,
         lng: store.lng
@@ -80,12 +80,12 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
     res.json(nearbyStores.map(store => ({
       id: store.id,
       nome: store.name,
-      rua: store.address,
-      bairro: store.bairro,
+      rua: store.street,
       numero: store.number,
       cep: store.cep,
-      cidade: store.cidade,
-      estado: store.estado,
+      cidade: store.city,
+      estado: store.state,
+      bairro: store.district,
       coordenadas: {
         lat: store.lat,
         lng: store.lng
