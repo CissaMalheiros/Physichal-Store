@@ -5,9 +5,9 @@ import { getCoordinates } from '../services/geocodingService';
 import { calculateDistance } from '../utils/distanceUtils';
 import logger from '../utils/logger';
 
-export async function addStore(req: Request, res: Response) {
+export async function addStore(request: Request, response: Response) {
   const db = await openDb();
-  const { name, number, cep } = req.body;
+  const { name, number, cep } = request.body;
 
   try {
     logger.info(`Adicionando loja: ${name}, CEP: ${cep}`);
@@ -18,27 +18,27 @@ export async function addStore(req: Request, res: Response) {
     await db.run('INSERT INTO stores (name, street, number, cep, lat, lng, city, state, district) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [name, addressData.logradouro, number, cep, coordinates.lat, coordinates.lng, addressData.localidade, addressData.uf, addressData.bairro]);
     logger.info(`Loja adicionada com sucesso: ${name}`);
-    res.status(201).json({ message: 'Loja adicionada com sucesso' });
+    response.status(201).json({ message: 'Loja adicionada com sucesso' });
   } catch (error) {
     logger.error('Erro ao adicionar loja:', error);
-    res.status(400).json({ message: (error as Error).message });
+    response.status(400).json({ message: (error as Error).message });
   }
 }
 
-export async function listStores(req: Request, res: Response): Promise<void> {
+export async function listStores(request: Request, response: Response): Promise<void> {
   try {
     logger.info('Listando todas as lojas');
     const db = await openDb();
     const stores = await db.all('SELECT * FROM stores');
-    res.json(stores.map(store => ({
+    response.json(stores.map(store => ({
       id: store.id,
       nome: store.name,
-      rua: store.street,
-      numero: store.number,
-      cep: store.cep,
       cidade: store.city,
       estado: store.state,
       bairro: store.district,
+      rua: store.street,
+      numero: store.number,
+      cep: store.cep,
       coordenadas: {
         lat: store.lat,
         lng: store.lng
@@ -47,12 +47,12 @@ export async function listStores(req: Request, res: Response): Promise<void> {
     logger.info('Lojas listadas com sucesso');
   } catch (error) {
     logger.error('Erro ao listar lojas:', error);
-    res.status(500).json({ message: 'Erro ao listar lojas' });
+    response.status(500).json({ message: 'Erro ao listar lojas' });
   }
 }
 
-export async function findNearbyStores(req: Request, res: Response): Promise<void> {
-  const { cep } = req.params;
+export async function findNearbyStores(request: Request, response: Response): Promise<void> {
+  const { cep } = request.params;
 
   try {
     logger.info(`Buscando lojas próximas para o CEP: ${cep}`);
@@ -73,19 +73,19 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
 
     if (nearbyStores.length === 0) {
       logger.info('Nenhuma loja encontrada num raio de 100km');
-      res.status(404).json({ message: 'Nenhuma loja encontrada num raio de 100km' });
+      response.status(404).json({ message: 'Nenhuma loja encontrada num raio de 100km' });
       return;
     }
 
-    res.json(nearbyStores.map(store => ({
+    response.json(nearbyStores.map(store => ({
       id: store.id,
       nome: store.name,
-      rua: store.street,
-      numero: store.number,
-      cep: store.cep,
       cidade: store.city,
       estado: store.state,
       bairro: store.district,
+      rua: store.street,
+      numero: store.number,
+      cep: store.cep,
       coordenadas: {
         lat: store.lat,
         lng: store.lng
@@ -95,12 +95,12 @@ export async function findNearbyStores(req: Request, res: Response): Promise<voi
     logger.info('Lojas próximas encontradas com sucesso');
   } catch (error) {
     logger.error('Erro ao buscar lojas próximas:', error);
-    res.status(400).json({ message: (error as Error).message });
+    response.status(400).json({ message: (error as Error).message });
   }
 }
 
-export async function deleteStore(req: Request, res: Response): Promise<void> {
-  const { id } = req.params;
+export async function deleteStore(request: Request, response: Response): Promise<void> {
+  const { id } = request.params;
 
   try {
     logger.info(`Deletando loja com ID: ${id}`);
@@ -109,14 +109,14 @@ export async function deleteStore(req: Request, res: Response): Promise<void> {
 
     if (result.changes === 0) {
       logger.info(`Loja com ID: ${id} não encontrada`);
-      res.status(404).json({ message: 'Loja não encontrada' });
+      response.status(404).json({ message: 'Loja não encontrada' });
       return;
     }
 
     logger.info(`Loja com ID: ${id} deletada com sucesso`);
-    res.status(200).json({ message: 'Loja deletada com sucesso' });
+    response.status(200).json({ message: 'Loja deletada com sucesso' });
   } catch (error) {
     logger.error('Erro ao deletar loja:', error);
-    res.status(500).json({ message: 'Erro ao deletar a loja' });
+    response.status(500).json({ message: 'Erro ao deletar a loja' });
   }
 }
