@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import storeRoutes from './routes/storeRoutes';
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './swagger.json';
+import swaggerDocument from '../swagger.json';
 import { createTable } from './models/storeModel';
 
 dotenv.config();
