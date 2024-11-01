@@ -30,7 +30,7 @@ export async function listStores(request: Request, response: Response): Promise<
     logger.info('Listando todas as lojas');
     const db = await openDb();
     const stores = await db.all('SELECT * FROM stores');
-    response.json(stores.map(store => ({
+    response.status(200).json(stores.map(store => ({
       id: store.id,
       nome: store.name,
       cidade: store.city,
@@ -77,7 +77,7 @@ export async function findNearbyStores(request: Request, response: Response): Pr
       return;
     }
 
-    response.json(nearbyStores.map(store => ({
+    response.status(200).json(nearbyStores.map(store => ({
       id: store.id,
       nome: store.name,
       cidade: store.city,
