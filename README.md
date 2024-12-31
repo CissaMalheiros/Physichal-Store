@@ -76,10 +76,7 @@ cd Physichal-Store
 npm install
 ```
 
-3. Crie um arquivo .env na raiz do projeto e adicione sua chave da API do Google ( será disponibilizada temporariamente uma chave válida para testes ):
-```
-GOOGLE_API_KEY=AIzaSyDEg_Q75KwbrLKhHInZUDl37X3-ShjMifs
-```
+3. Crie um arquivo .env na raiz do projeto e adicione sua chave da API do Google
 
 ## Utilização
 
